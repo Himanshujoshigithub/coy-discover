@@ -14,25 +14,12 @@ const app = express();
 // Allowed frontend URLs
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://coy-discover-three.vercel.app",
-
-    // Additional production origins from Render environment
-    ...(process.env.CLIENT_ORIGIN || "")
-        .split(",")
-        .map(origin => origin.trim())
-        .filter(Boolean)
+    "https://coy-discover-three.vercel.app"
 ];
 
 // CORS configuration
 app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests without an Origin header (Postman, etc.)
-        if (!origin || allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-
-        return callback(new Error(`CORS blocked origin: ${origin}`));
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"]
 }));
