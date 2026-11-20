@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 
 import Navbar from "./components/Navbar";
@@ -6,7 +5,7 @@ import ProfileCard from "./components/ProfileCard";
 import MatchModal from "./components/MatchModal";
 
 import Home from "./pages/Home";
-import Matches from "./pages/matches";
+import Matches from "./pages/Matches.jsx";
 import {
     getFeed,
     getMatches,
