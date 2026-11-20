@@ -11,24 +11,47 @@ const swipeRoutes = require("./routes/swipe");
 
 const app = express();
 
-// 1. Middleware MUST come before routes
+// Allowed frontend URLs
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://coy-discover-three.vercel.app",
+
+    // Additional production origins from Render environment
+    ...(process.env.CLIENT_ORIGIN || "")
+        .split(",")
+        .map(origin => origin.trim())
+        .filter(Boolean)
+];
+
+// CORS configuration
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: (origin, callback) => {
+        // Allow requests without an Origin header (Postman, etc.)
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`CORS blocked origin: ${origin}`));
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
 }));
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/matches", matchesRoutes);
 
-// 2. Routes
+// Home route
 app.get("/", (req, res) => {
     res.send("Coy Discover API is running!");
 });
 
+// API routes
 app.use("/feed", feedRoutes);
 app.use("/swipe", swipeRoutes);
+app.use("/matches", matchesRoutes);
 
-// 3. Database health check
+// Database health check
 app.get("/health", async (req, res) => {
     try {
         const [rows] = await db.query(
@@ -40,8 +63,9 @@ app.get("/health", async (req, res) => {
             message: "MySQL connected successfully!",
             database: rows[0].databaseName
         });
+
     } catch (error) {
-        console.error(error);
+        console.error("Database error:", error);
 
         res.status(500).json({
             success: false,
@@ -50,9 +74,9 @@ app.get("/health", async (req, res) => {
     }
 });
 
-// 4. Start server
+// Start server
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
