@@ -1,8 +1,16 @@
 
 import axios from "axios";
 
+// Use localhost for local development
+// Use Render for the deployed Vercel frontend
+const API_BASE_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000"
+        : "https://coy-discover-teyo.onrender.com";
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000","https://coy-discover-teyo.onrender.com",
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json"
     }
